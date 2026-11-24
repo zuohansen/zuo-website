@@ -1,0 +1,1311 @@
+<title>Zuo Property Management</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout concept: an open-book work order. Plain-spoken headlines on the left, and a repair
+   statement on the right that prints the price range, the benchmark and the price guarantee
+   on one ruled scale. */
+:root {
+  --paper: #f3f5f1;
+  --surface: #ffffff;
+  --ink: #16211c;
+  --muted: #56645c;
+  --line: #d3dbd5;
+  --door: #1d5a43;
+  --door-strong: #154532;
+  --on-door: #ffffff;
+  --tint: #e3ede7;
+  --brass: #94651a;
+  --brass-soft: #f4e8cf;
+  --signal: #ad3f2b;
+  --signal-soft: #f7e1db;
+  --shadow: rgba(22, 33, 28, 0.16);
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: 1.55rem;
+  --step-3: clamp(1.75rem, 3.4vw, 2.3rem);
+  --step-4: clamp(2.2rem, 5.4vw, 3.7rem);
+  --radius: 4px;
+  --max: 72rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1512;
+    --surface: #141e19;
+    --ink: #e6ece8;
+    --muted: #a2b1a9;
+    --line: #2b3a33;
+    --door: #6fbf97;
+    --door-strong: #8fd1ae;
+    --on-door: #0d1411;
+    --tint: #1a2922;
+    --brass: #dcae5a;
+    --brass-soft: #33291a;
+    --signal: #e8887a;
+    --signal-soft: #3b211c;
+    --shadow: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1512;
+  --surface: #141e19;
+  --ink: #e6ece8;
+  --muted: #a2b1a9;
+  --line: #2b3a33;
+  --door: #6fbf97;
+  --door-strong: #8fd1ae;
+  --on-door: #0d1411;
+  --tint: #1a2922;
+  --brass: #dcae5a;
+  --brass-soft: #33291a;
+  --signal: #e8887a;
+  --signal-soft: #3b211c;
+  --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+a { color: var(--door); }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 3px; }
+h1, h2, h3, .h3 {
+  font-family: var(--display);
+  font-stretch: 112%;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  margin: 0;
+}
+h1 { font-size: var(--step-4); font-weight: 800; }
+h2 { font-size: var(--step-3); font-weight: 760; }
+h3, .h3 { font-size: var(--step-1); font-weight: 700; font-stretch: 104%; line-height: 1.2; }
+p { margin: 0; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.band { padding-block: clamp(48px, 7vw, 92px); }
+.band.tight { padding-block: clamp(36px, 5vw, 64px); }
+.band.alt { background: var(--tint); }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--door);
+}
+.label {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.lede { font-size: var(--step-1); line-height: 1.5; color: var(--muted); max-width: 36em; }
+.section-head { display: grid; gap: 12px; max-width: 46rem; align-content: start; }
+.section-head > p:not(.eyebrow) { color: var(--muted); }
+.prose { display: grid; gap: 16px; max-width: 65ch; }
+.page-head { display: grid; gap: 18px; max-width: 54rem; }
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding-block: 8px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand-mark { color: var(--door); flex: none; }
+.brand-text { display: grid; line-height: 1.05; }
+.brand-name { font-family: var(--display); font-stretch: 120%; font-weight: 800; font-size: 1.3rem; }
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.main-nav { display: flex; flex-wrap: wrap; gap: 2px 4px; }
+.main-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+}
+.main-nav a:hover { background: var(--tint); }
+.main-nav a[aria-current="page"] { color: var(--door); box-shadow: inset 0 -3px 0 var(--door); border-radius: 0; }
+.main-nav a.nav-cta { background: var(--door); color: var(--on-door); border-radius: var(--radius); }
+.main-nav a.nav-cta:hover { background: var(--door-strong); }
+.main-nav a.nav-cta[aria-current="page"] { box-shadow: none; background: var(--door-strong); }
+
+/* Buttons */
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  font: 700 1rem/1.2 var(--body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.btn-primary { background: var(--door); color: var(--on-door); }
+.btn-primary:hover { background: var(--door-strong); }
+.btn-quiet { background: transparent; color: var(--ink); border-color: var(--ink); justify-self: start; }
+.btn-quiet:hover { background: var(--surface); }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+.hero-copy { display: grid; gap: 22px; min-width: 0; }
+.where { font-family: var(--mono); font-size: 0.85rem; color: var(--muted); }
+.signoff {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 36em;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--door);
+  color: var(--on-door);
+  font: 800 1rem/1 var(--display);
+  font-stretch: 115%;
+  letter-spacing: 0.02em;
+}
+.signoff p { font-size: 0.98rem; line-height: 1.45; min-width: 0; }
+.signoff a { font-weight: 700; white-space: nowrap; }
+@media (max-width: 880px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+/* Repair statement */
+.statement {
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--door);
+  padding: 20px clamp(16px, 3vw, 28px);
+  box-shadow: 0 24px 48px -32px var(--shadow);
+}
+.statement-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tag {
+  background: var(--brass-soft);
+  color: var(--brass);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.statement-title { font-size: var(--step-2); }
+.statement-meta { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.statement figcaption { font-size: 0.85rem; color: var(--muted); }
+
+/* Price scale, drawn to scale: left = low end, right = high end */
+.scale { padding: 32px 0 4px; container-type: inline-size; }
+.track { position: relative; height: 10px; border-radius: 999px; background: var(--line); }
+.zone { position: absolute; top: 0; bottom: 0; }
+.zone-ok { left: 0; width: 75%; border-radius: 999px 0 0 999px; background: color-mix(in srgb, var(--door) 32%, transparent); }
+.zone-over { left: 75%; right: 0; border-radius: 0 999px 999px 0; background: color-mix(in srgb, var(--signal) 32%, transparent); }
+.tick { position: absolute; top: -7px; bottom: -7px; width: 2px; margin-left: -1px; background: var(--ink); }
+.tick-ceil { background: var(--signal); }
+.tick-label {
+  position: absolute;
+  top: 20px;
+  transform: translateX(-50%);
+  font: 500 0.7rem/1.25 var(--mono);
+  color: var(--muted);
+  white-space: nowrap;
+  text-align: center;
+}
+.tick-label b { display: block; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tick-label.ceil, .tick-label.ceil b { color: var(--signal); }
+/* The stretch of track between the price paid and the benchmark: the saving */
+.saving { position: absolute; top: 0; bottom: 0; background: var(--door); }
+.paid-dot {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 4px solid var(--surface);
+  box-shadow: 0 0 0 1.5px var(--brass);
+  transform: translate(-50%, -50%);
+}
+.paid-label {
+  position: absolute;
+  bottom: 22px;
+  transform: translateX(-50%);
+  font: 600 0.74rem/1.2 var(--mono);
+  color: var(--brass);
+  white-space: nowrap;
+}
+.scale-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 48px;
+  font: 500 0.72rem/1 var(--mono);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+/* On a narrow statement, the price guarantee label drops below the benchmark label,
+   with a dashed line up to its tick */
+.tick-ceil::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  height: 0;
+  border-left: 1px dashed var(--signal);
+}
+@container (max-width: 379px) {
+  .tick-label.ceil { top: 56px; }
+  .tick-ceil::after { height: 37px; }
+  .scale-ends { margin-top: 84px; }
+}
+
+/* Ledger rows */
+.ledger { margin: 0; display: grid; font-family: var(--mono); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.ledger > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-block: 7px;
+  border-bottom: 1px dashed var(--line);
+}
+.ledger dt { color: var(--muted); min-width: 0; }
+.ledger dd { margin: 0; font-weight: 600; text-align: right; white-space: nowrap; }
+.ledger .paid-row dd { color: var(--brass); }
+.ledger .save-row dd { color: var(--door); }
+.ledger .total { border-bottom: 0; border-top: 2px solid var(--ink); padding-top: 10px; }
+.ledger .total dt { color: var(--ink); font-weight: 600; }
+.ledger .total dd { color: var(--door); font-size: 1.1rem; }
+
+/* What you get */
+.promises {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px 48px;
+  margin-top: 36px;
+}
+.promise, .bring-item, .figure {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  border-top: 2px solid var(--door);
+  padding-top: 18px;
+}
+@media (max-width: 720px) { .promises { grid-template-columns: minmax(0, 1fr); } }
+
+/* Steps: a real sequence */
+.steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; counter-reset: step; }
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+  gap: 12px 20px;
+  padding-block: 20px;
+  border-top: 1px solid var(--line);
+}
+.steps li:last-child { border-bottom: 1px solid var(--line); }
+.steps li::before { content: counter(step, decimal-leading-zero); font: 600 1.15rem/1.3 var(--mono); color: var(--door); }
+.steps li > div { display: grid; gap: 6px; min-width: 0; }
+.steps p { color: var(--muted); max-width: 60ch; }
+
+/* Two-column bands */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: start;
+}
+@media (max-width: 820px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; }
+.checklist li {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 12px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.checklist li:first-child { border-top: 1px solid var(--line); }
+.checklist li::before { content: ""; width: 12px; height: 12px; margin-top: 0.45em; background: var(--door); border-radius: 2px; }
+.checklist.never li::before { width: 14px; height: 2px; margin-top: 0.8em; background: var(--signal); border-radius: 0; }
+
+/* Big figures */
+.figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-block: 36px 32px; }
+.figure { border-top-color: var(--ink); }
+.big {
+  font-family: var(--display);
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  line-height: 1;
+  color: var(--door);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 720px) { .figures { grid-template-columns: minmax(0, 1fr); } }
+
+/* Forms */
+.form-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+@media (max-width: 880px) { .form-wrap { grid-template-columns: minmax(0, 1fr); } }
+.lead-form {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(18px, 3vw, 28px);
+}
+.preview-note {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: var(--tint);
+  padding: 8px 10px;
+  border-radius: var(--radius);
+}
+.row { display: grid; gap: 16px; }
+.row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.row.three { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr); }
+@media (max-width: 560px) { .row.two, .row.three { grid-template-columns: minmax(0, 1fr); } }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 12px; }
+legend { padding: 0; margin-bottom: 8px; font-weight: 700; font-size: 1rem; }
+.field { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.field label { font-weight: 700; font-size: 0.95rem; }
+.opt { font-weight: 400; color: var(--muted); }
+.field input, .field select, .field textarea, .money-input input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+}
+.field textarea { resize: vertical; min-height: 88px; }
+.field input[aria-invalid="true"] { border-color: var(--signal); }
+.err { color: var(--signal); font-size: 0.88rem; }
+.form-status { font-weight: 700; min-height: 1.6em; }
+.form-status[data-state="done"] { color: var(--door); }
+.form-status[data-state="error"] { color: var(--signal); }
+.lead-form .btn { justify-self: start; }
+
+/* Contact page */
+.next { display: grid; gap: 10px; margin-top: 8px; }
+.next-steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; color: var(--muted); }
+
+/* About page */
+.story {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+@media (max-width: 820px) { .story { grid-template-columns: minmax(0, 1fr); } }
+.bring { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 40px; margin-top: 36px; }
+@media (max-width: 960px) { .bring { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .bring { grid-template-columns: minmax(0, 1fr); } }
+.rules {
+  list-style: none;
+  margin: 32px 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 40px;
+}
+.rules li { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.rules p { color: var(--muted); }
+@media (max-width: 760px) { .rules { grid-template-columns: minmax(0, 1fr); } }
+
+/* Pricing page */
+.parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.part {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 22px;
+}
+@media (max-width: 900px) { .parts { grid-template-columns: minmax(0, 1fr); } }
+.formula {
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  background: var(--tint);
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+}
+.mini-calc { display: grid; gap: 8px; margin-top: 6px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.mini-calc label { font-weight: 700; font-size: 0.95rem; }
+.money-input {
+  display: flex;
+  align-items: center;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+}
+.money-input span { padding-left: 12px; font-family: var(--mono); color: var(--muted); }
+.money-input input { border: 0; background: transparent; min-width: 0; }
+.money-input input:focus-visible { outline: none; }
+.money-input:focus-within { outline: 3px solid var(--brass); outline-offset: 2px; }
+.mini-out { font-size: 0.95rem; }
+.mini-out strong { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.calc-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: start;
+}
+@media (max-width: 880px) { .calc-wrap { grid-template-columns: minmax(0, 1fr); } }
+.calc {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--brass);
+  padding: 22px clamp(16px, 3vw, 28px);
+}
+.calc-inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .calc-inputs { grid-template-columns: minmax(0, 1fr); } }
+.calc-inputs label { font-weight: 700; font-size: 0.9rem; }
+input[type="range"] { width: 100%; margin: 0; accent-color: var(--brass); }
+.pill { display: inline-block; font: 600 0.8rem/1.2 var(--mono); padding: 6px 12px; border-radius: 999px; }
+.pill.ok { background: var(--tint); color: var(--door); }
+.pill.over { background: var(--signal-soft); color: var(--signal); }
+.example {
+  display: grid;
+  gap: 8px;
+  max-width: 48rem;
+  background: var(--brass-soft);
+  padding: 20px 22px;
+  border-radius: var(--radius);
+}
+.example .label { color: var(--brass); }
+.faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 48px; margin-top: 44px; }
+.faq > div { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.faq p { color: var(--muted); }
+@media (max-width: 720px) { .faq { grid-template-columns: minmax(0, 1fr); } }
+
+/* Footer */
+.site-footer { border-top: 1px solid var(--line); background: var(--paper); }
+.footer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px 40px;
+  padding-block: 36px;
+  align-items: start;
+}
+.footer-inner p { color: var(--muted); font-size: 0.95rem; max-width: 46ch; }
+.footer-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-self: end; }
+.footer-nav a { color: var(--ink); font-weight: 700; text-decoration: none; padding-block: 6px; }
+.fine { grid-column: 1 / -1; font-family: var(--mono); font-size: 0.75rem; }
+@media (max-width: 720px) {
+  .footer-inner { grid-template-columns: minmax(0, 1fr); }
+  .footer-nav { justify-self: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#home" aria-label="Zuo Property Management, home">
+      <svg class="brand-mark" width="24" height="28" viewBox="0 0 24 28" aria-hidden="true">
+        <path d="M3 26V10a9 9 0 0 1 18 0v16" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <path d="M0 26.5h24" fill="none" stroke="currentColor" stroke-width="2.6"/>
+        <circle cx="16" cy="17" r="1.8" fill="currentColor"/>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">Zuo</span>
+        <span class="brand-sub">Property Management</span>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      <a href="#home" data-nav="home" aria-current="page">Home</a>
+      <a href="#about" data-nav="about">About us</a>
+      <a href="#pricing" data-nav="pricing">Pricing</a>
+      <a href="#contact" data-nav="contact" class="nav-cta">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ HOME ============ -->
+<div id="page-home" data-page="home">
+  <section class="band" aria-labelledby="home-title">
+    <div class="wrap hero">
+      <div class="hero-copy">
+        <p class="eyebrow">For owners of single-family rentals and multi-family rentals with up to four units</p>
+        <h1 id="home-title" tabindex="-1">We handle every repair on your rental, and make every dollar count.</h1>
+        <p class="lede">Our AI answers your tenants at any hour, works out what's wrong, and does the legwork to find you 3 competitive quotes. You approve repairs by text, with the quotes side by side. We never mark up a repair bill, and we only earn extra when we save you money.</p>
+        <div class="signoff">
+          <span class="avatar" aria-hidden="true">HZ</span>
+          <p>Hansen Zuo, our founder, checks every recommendation our AI makes before it reaches you. <a href="#about">About Hansen</a></p>
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="#contact">Tell us about your property</a>
+          <a class="btn btn-quiet" href="#pricing">See pricing</a>
+        </div>
+        <p class="where">Available in New York City, the Tri-State area and the Atlanta area. Coming soon across the U.S.</p>
+      </div>
+
+      <figure class="statement" aria-labelledby="stmt-title">
+        <div class="statement-head">
+          <span>Repair statement</span>
+          <span class="tag">Example</span>
+        </div>
+        <h2 class="statement-title" id="stmt-title">Replace the tank water heater</h2>
+        <p class="statement-meta">Reported Tuesday 7:42 AM. Quotes checked by Hansen. Fixed Wednesday 3:10 PM.</p>
+        <div class="scale" role="img" aria-label="Price scale from $882 to $1,826. The benchmark is $1,354, the price guarantee is $1,590, and the price paid was $1,150, a saving of $204 against the benchmark.">
+          <div class="track">
+            <span class="zone zone-ok"></span>
+            <span class="zone zone-over"></span>
+            <span class="saving" style="left: 28.39%; width: 21.61%"></span>
+            <span class="tick" style="left: 50%"></span>
+            <span class="tick tick-ceil" style="left: 75%"></span>
+            <span class="tick-label" style="left: 50%">Benchmark<b>$1,354</b></span>
+            <span class="tick-label ceil" style="left: 75%">Price guarantee<b>$1,590</b></span>
+            <span class="paid-dot" style="left: 28.39%"></span>
+            <span class="paid-label" style="left: 28.39%">Paid $1,150</span>
+          </div>
+          <div class="scale-ends"><span>$882</span><span>$1,826</span></div>
+        </div>
+        <dl class="ledger">
+          <div><dt>Typical range published by Angi</dt><dd>$882 – $1,826</dd></div>
+          <div><dt>Benchmark: the middle of the range</dt><dd>$1,354</dd></div>
+          <div><dt>Price guarantee: never above</dt><dd>$1,590</dd></div>
+          <div class="paid-row"><dt>Price paid</dt><dd>$1,150</dd></div>
+          <div class="save-row"><dt>Saving vs. benchmark</dt><dd>$204</dd></div>
+          <div><dt>Our share, 25%</dt><dd>$51</dd></div>
+          <div class="total"><dt>You keep</dt><dd>$153</dd></div>
+        </dl>
+        <figcaption>The range is from <a href="https://www.angi.com/articles/how-much-does-water-heater-installation-cost.htm" target="_blank" rel="noopener">Angi's national guide to water heater replacement</a>, updated October 16, 2026. The price paid is an example.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band alt" aria-labelledby="get-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">What you get</p>
+        <h2 id="get-title">Repairs done right, at a fair price, with every step in view</h2>
+      </div>
+      <div class="promises">
+        <article class="promise">
+          <p class="label">Transparent</p>
+          <h3>Every repair in one place</h3>
+          <p>For each job you see your tenant's photos, the likely cause, the quotes, which vendor we picked and why, the invoice, and photos of the finished work.</p>
+        </article>
+        <article class="promise">
+          <p class="label">Lower cost</p>
+          <h3>Prices checked against Angi's cost guides</h3>
+          <p>We walk tenants through simple fixes first, like a tripped breaker or a clogged air filter. Jobs above an amount you set get 3 competitive quotes, and every price is checked against Angi's cost guides. We never mark up a bill or take a fee from a vendor.</p>
+        </article>
+        <article class="promise">
+          <p class="label">Faster</p>
+          <h3>An answer for your tenant right away</h3>
+          <p>At our founder's rental, a typical property manager took a median of 15 days to finish a repair after the owner approved it. We counted to the day the bill was paid, across 5 repairs.</p>
+          <p>Our AI answers tenants at any hour, books the vendor around their schedule, and sends updates until the job is done.</p>
+        </article>
+        <article class="promise">
+          <p class="label">Peace of mind</p>
+          <h3>No 3 AM calls</h3>
+          <p>Problems come to us first. You hear from us only when a decision needs you, with the options side by side and Hansen's recommendation. You approve by text.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How a repair works</p>
+        <h2 id="how-title">From a tenant's text to a finished job</h2>
+      </div>
+      <ol class="steps">
+        <li><div><h3>Your tenant reports the problem</h3><p>By text, phone call or photo, at any hour.</p></div></li>
+        <li><div><h3>Our AI works out what's wrong</h3><p>It asks the right questions and walks the tenant through simple fixes. Real emergencies go straight to Hansen.</p></div></li>
+        <li><div><h3>We get 3 quotes, and Hansen checks them</h3><p>Each quote is compared with the job's typical price range on Angi.</p></div></li>
+        <li><div><h3>You approve by text</h3><p>You see the quotes side by side, with Hansen's recommendation. Small jobs under an amount you set go ahead without asking you.</p></div></li>
+        <li><div><h3>The job is done and checked</h3><p>Your tenant confirms the fix, and you get the invoice with before and after photos.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band alt" aria-labelledby="tenants-title">
+    <div class="wrap split">
+      <div class="section-head">
+        <p class="eyebrow">For your tenants</p>
+        <h2 id="tenants-title">A home that's looked after</h2>
+        <p>Good repairs are part of being a good landlord. Your tenants get:</p>
+      </div>
+      <ul class="checklist">
+        <li>A way to report any problem at any hour, by text, call or photo</li>
+        <li>An answer right away, and a visit at a time that suits them</li>
+        <li>The right vendor with the right parts, so the fix works the first time</li>
+        <li>Upkeep before things break, like servicing the heating before winter</li>
+        <li>A check-in after every repair to make sure it's fixed</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="price-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Pricing</p>
+        <h2 id="price-title">One base fee, and a share of what we save you</h2>
+      </div>
+      <div class="figures">
+        <div class="figure"><p class="big">6%</p><p>of the monthly base rent is our base fee.</p></div>
+        <div class="figure"><p class="big">25%</p><p>of what we save you on a repair is ours. You keep the other 75%.</p></div>
+        <div class="figure"><p class="big">75%</p><p>of the way up a job's typical price range is the most a repair will cost you.</p></div>
+      </div>
+      <a class="btn btn-quiet" href="#pricing">See how pricing works</a>
+    </div>
+  </section>
+
+  <section class="band alt" aria-labelledby="h-form-title">
+    <div class="wrap form-wrap">
+      <div class="section-head">
+        <p class="eyebrow">Get started</p>
+        <h2 id="h-form-title">Tell us about your property</h2>
+        <p>Share a few details, and we'll get in touch about what Zuo would do for your rental.</p>
+      </div>
+      <form class="lead-form" id="h-form" novalidate aria-labelledby="h-form-title">
+        <p class="preview-note">Preview: this form checks your details, but it isn't connected yet, so nothing is sent.</p>
+        <div class="row two">
+          <div class="field">
+            <label for="h-first">First name</label>
+            <input id="h-first" name="first_name" autocomplete="given-name" required data-msg="Enter your first name." aria-describedby="h-first-err">
+            <p class="err" id="h-first-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="h-last">Last name</label>
+            <input id="h-last" name="last_name" autocomplete="family-name" required data-msg="Enter your last name." aria-describedby="h-last-err">
+            <p class="err" id="h-last-err" hidden></p>
+          </div>
+        </div>
+        <fieldset>
+          <legend>Property address</legend>
+          <div class="field">
+            <label for="h-street">Street address</label>
+            <input id="h-street" name="street" autocomplete="address-line1" required data-msg="Enter the street address." aria-describedby="h-street-err">
+            <p class="err" id="h-street-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="h-unit">Unit or apartment <span class="opt">(optional)</span></label>
+            <input id="h-unit" name="unit" autocomplete="address-line2">
+          </div>
+          <div class="row three">
+            <div class="field">
+              <label for="h-city">City</label>
+              <input id="h-city" name="city" autocomplete="address-level2" required data-msg="Enter the city." aria-describedby="h-city-err">
+              <p class="err" id="h-city-err" hidden></p>
+            </div>
+            <div class="field">
+              <label for="h-state">State</label>
+              <input id="h-state" name="state" autocomplete="address-level1" maxlength="20" required data-msg="Enter the state." aria-describedby="h-state-err">
+              <p class="err" id="h-state-err" hidden></p>
+            </div>
+            <div class="field">
+              <label for="h-zip">ZIP code</label>
+              <input id="h-zip" name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="10" required data-msg="Enter the ZIP code." data-check="zip" aria-describedby="h-zip-err">
+              <p class="err" id="h-zip-err" hidden></p>
+            </div>
+          </div>
+        </fieldset>
+        <div class="row two">
+          <div class="field">
+            <label for="h-email">Email</label>
+            <input id="h-email" name="email" type="email" autocomplete="email" required data-msg="Enter your email address." data-check="email" aria-describedby="h-email-err">
+            <p class="err" id="h-email-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="h-phone">Phone</label>
+            <input id="h-phone" name="phone" type="tel" autocomplete="tel" required data-msg="Enter your phone number." data-check="phone" aria-describedby="h-phone-err">
+            <p class="err" id="h-phone-err" hidden></p>
+          </div>
+        </div>
+        <div class="row two">
+          <div class="field">
+            <label for="h-units">Number of units <span class="opt">(optional)</span></label>
+            <select id="h-units" name="units">
+              <option value="">Choose</option>
+              <option value="1">1, a single-family home</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5+">5 or more</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="h-notes">Anything else we should know? <span class="opt">(optional)</span></label>
+          <textarea id="h-notes" name="notes" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+        <p class="form-status" id="h-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<div id="page-about" data-page="about" hidden>
+  <section class="band" aria-labelledby="about-title">
+    <div class="wrap page-head">
+      <p class="eyebrow">About us</p>
+      <h1 id="about-title" tabindex="-1">Run by a landlord who builds AI systems</h1>
+      <p class="lede">Zuo Property Management is run by me, Hansen Zuo. I own a rental home in the Atlanta area and manage it from New York. I've spent my career building software that makes fast, careful decisions at scale.</p>
+    </div>
+  </section>
+
+  <section class="band alt tight" aria-labelledby="why-title">
+    <div class="wrap story">
+      <div class="section-head">
+        <p class="eyebrow">Why I started Zuo</p>
+        <h2 id="why-title">I'm a landlord too</h2>
+      </div>
+      <div class="prose">
+        <p>I've used a property manager for my rental since 2021. They kept problems away from me, and I valued that.</p>
+        <p>Repairs were the problem. Quotes were passed along with little checking. Three vendors got three-quarters of my repair spending. When a tenant moved out, the house sat empty for 40 days. Once every fee was added up, I paid almost 11% of the rent. The agreement said 8%.</p>
+        <p>I started Zuo to run repairs the way I want them run for my own home: every quote checked, every dollar shown, and no markup on any bill.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="bring-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">What I bring</p>
+        <h2 id="bring-title">Experience that fits the job</h2>
+      </div>
+      <div class="bring">
+        <article class="bring-item">
+          <p class="label">AI agents</p>
+          <h3>Replacing slow manual review</h3>
+          <p>At Meta, I drove the design of a multi-agent AI system that replaced human review. It cut review volume by 60% and the time to a decision from 3 days to 2 hours.</p>
+        </article>
+        <article class="bring-item">
+          <p class="label">Fraud prevention</p>
+          <h3>Stopping account takeovers</h3>
+          <p>I owned Meta's end-to-end strategy against advertiser account takeover fraud, cutting revenue loss by $400 million a year. I bring the same care to spotting fake invoices and rental scams.</p>
+        </article>
+        <article class="bring-item">
+          <p class="label">Billing</p>
+          <h3>Billing for 100 million subscribers</h3>
+          <p>At LotusFlare, I built billing for a platform with more than 100 million subscribers, including proration, dunning (the reminders that chase unpaid bills) and invoicing. Rent, late notices and owner statements are the same kind of work.</p>
+        </article>
+        <article class="bring-item">
+          <p class="label">Real estate</p>
+          <h3>Products for home sellers</h3>
+          <p>At Realtor.com, a site with 63 million users, I conceived and validated the home-seller marketplace concept behind its partnership with Opendoor.</p>
+        </article>
+        <article class="bring-item">
+          <p class="label">Already building</p>
+          <h3>An AI agent for maintenance</h3>
+          <p>I've built an AI agent that sorts tenants' maintenance requests and books vendors.</p>
+        </article>
+        <article class="bring-item">
+          <p class="label">Education</p>
+          <h3>Engineering and business</h3>
+          <p>MBA from the University of Michigan's Ross School of Business (2018). Bachelor of Engineering from the University of Toronto (2012).</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt tight" aria-labelledby="rules-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How we work</p>
+        <h2 id="rules-title">Three rules we keep</h2>
+      </div>
+      <ul class="rules">
+        <li><h3>Every number is shown</h3><p>Quotes, invoices, and the public price range for each job.</p></li>
+        <li><h3>No markups</h3><p>We never add to a repair bill or take a fee from a vendor.</p></li>
+        <li><h3>Hansen checks the AI's work</h3><p>Our AI handles the routine work. Hansen checks its recommendations and handles anything urgent.</p></li>
+      </ul>
+      <a class="btn btn-primary" href="#contact">Tell us about your property</a>
+    </div>
+  </section>
+</div>
+
+<!-- ============ PRICING ============ -->
+<div id="page-pricing" data-page="pricing" hidden>
+  <section class="band" aria-labelledby="pricing-title">
+    <div class="wrap page-head">
+      <p class="eyebrow">Pricing</p>
+      <h1 id="pricing-title" tabindex="-1">One base fee, and a share of what we save you</h1>
+      <p class="lede">You pay a base fee of 6% of the monthly base rent. When we get a repair done for less than its benchmark price, you keep 75% of the saving and we earn 25%. There are no other fees.</p>
+    </div>
+  </section>
+
+  <section class="band alt tight" aria-label="The three parts of our pricing">
+    <div class="wrap parts">
+      <article class="part">
+        <p class="label">Base fee</p>
+        <p class="big">6%</p>
+        <p>of the monthly base rent. It covers tenant messages at any hour, repairs and vendors, rent collection and your monthly statement.</p>
+        <div class="mini-calc">
+          <label for="rent">Your monthly rent</label>
+          <div class="money-input"><span aria-hidden="true">$</span><input id="rent" type="number" inputmode="decimal" min="0" step="50" value="2000"></div>
+          <p class="mini-out" aria-live="polite">Base fee: <strong id="rent-month">$120</strong> a month, <strong id="rent-year">$1,440</strong> a year</p>
+        </div>
+      </article>
+      <article class="part">
+        <p class="label">Repair savings</p>
+        <p class="big">25%</p>
+        <p>of what we save you. For each repair, we look up the job's typical price range on Angi. The middle of that range is the benchmark.</p>
+        <p>If the price comes in below the benchmark, you keep 75% of the difference and we earn 25%. If it doesn't, we earn nothing on that repair.</p>
+      </article>
+      <article class="part">
+        <p class="label">Price guarantee</p>
+        <p class="big">75%</p>
+        <p>No repair will cost you more than the point 75% of the way up Angi's typical range.</p>
+        <p class="formula">Price guarantee = low end + 75% × (high end − low end)</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="try-title">
+    <div class="wrap calc-wrap">
+      <div class="section-head">
+        <p class="eyebrow">Try it</p>
+        <h2 id="try-title">See how a repair is priced</h2>
+        <p>Enter a job's typical range from Angi and the price paid. The example is Angi's range for replacing a tank water heater.</p>
+      </div>
+      <div class="calc">
+        <div class="calc-inputs">
+          <div class="field">
+            <label for="calc-low">Low end of range</label>
+            <div class="money-input"><span aria-hidden="true">$</span><input id="calc-low" type="number" inputmode="decimal" min="0" step="1" value="882"></div>
+          </div>
+          <div class="field">
+            <label for="calc-high">High end of range</label>
+            <div class="money-input"><span aria-hidden="true">$</span><input id="calc-high" type="number" inputmode="decimal" min="0" step="1" value="1826"></div>
+          </div>
+          <div class="field">
+            <label for="calc-paid">Price paid</label>
+            <div class="money-input"><span aria-hidden="true">$</span><input id="calc-paid" type="number" inputmode="decimal" min="0" step="1" value="1150"></div>
+          </div>
+        </div>
+        <input id="calc-slider" type="range" min="440" max="2100" step="10" value="1150" aria-label="Price paid">
+        <p class="err" id="calc-msg" hidden></p>
+        <div class="scale" aria-hidden="true">
+          <div class="track">
+            <span class="zone zone-ok"></span>
+            <span class="zone zone-over"></span>
+            <span class="saving" id="calc-band" style="left: 28.39%; width: 21.61%"></span>
+            <span class="tick" style="left: 50%"></span>
+            <span class="tick tick-ceil" style="left: 75%"></span>
+            <span class="tick-label" style="left: 50%">Benchmark<b id="calc-tick-mid">$1,354</b></span>
+            <span class="tick-label ceil" style="left: 75%">Price guarantee<b id="calc-tick-ceil">$1,590</b></span>
+            <span class="paid-dot" id="calc-dot" style="left: 28.39%"></span>
+            <span class="paid-label" id="calc-dot-label" style="left: 28.39%">Paid $1,150</span>
+          </div>
+          <div class="scale-ends"><span id="calc-end-low">$882</span><span id="calc-end-high">$1,826</span></div>
+        </div>
+        <dl class="ledger" aria-live="polite">
+          <div><dt>Benchmark: the middle of the range</dt><dd id="calc-mid">$1,354</dd></div>
+          <div><dt>Price guarantee: never above</dt><dd id="calc-ceil">$1,590</dd></div>
+          <div class="save-row"><dt>Saving vs. benchmark</dt><dd id="calc-saved">$204</dd></div>
+          <div><dt>Our share, 25%</dt><dd id="calc-share">$51</dd></div>
+          <div class="total"><dt>You keep</dt><dd id="calc-keep">$153</dd></div>
+        </dl>
+        <p><span class="pill ok" id="calc-status">Within the price guarantee</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt tight" aria-labelledby="never-title">
+    <div class="wrap split">
+      <div class="section-head">
+        <p class="eyebrow">What we never charge</p>
+        <h2 id="never-title">No other fees</h2>
+      </div>
+      <ul class="checklist never">
+        <li>Markups on repair bills</li>
+        <li>Fees taken from vendors</li>
+        <li>Setup fees</li>
+        <li>Lease renewal fees</li>
+        <li>Monthly admin fees</li>
+        <li>Leasing fees. Licensed local realtors find your tenants and bill you directly.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="faq-title">
+    <div class="wrap">
+      <aside class="example">
+        <p class="label">A real example</p>
+        <p>One owner's manager charged 8% of the rent on paper. With leasing, renewal and admin fees, the total came to 10.7% of the rent collected over almost five years. That owner is Hansen, our founder.</p>
+      </aside>
+      <h2 id="faq-title" style="margin-top: 48px">Questions</h2>
+      <div class="faq">
+        <div><h3>What counts as a saving?</h3><p>Only finished repairs. The saving is the benchmark price minus the price you paid. A skipped or delayed repair never counts.</p></div>
+        <div><h3>Which cost guide do you use?</h3><p>Angi, formerly Angie's List. Its cost guides are free, so you can check any price yourself. Every repair statement names the Angi page and shows the range.</p></div>
+        <div><h3>Who handles leasing?</h3><p>Licensed local realtors find tenants and bill you directly. A tenant can also use their own agent.</p></div>
+        <div><h3>Where do you work?</h3><p>New York City, the Tri-State area and the Atlanta area.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ CONTACT ============ -->
+<div id="page-contact" data-page="contact" hidden>
+  <section class="band" aria-labelledby="contact-title">
+    <div class="wrap form-wrap">
+      <div class="section-head">
+        <p class="eyebrow">Contact</p>
+        <h1 id="contact-title" tabindex="-1">Tell us about your property</h1>
+        <p class="lede">Share a few details, and we'll get in touch about what Zuo would do for your rental.</p>
+        <div class="next">
+          <h2 class="h3">What happens next</h2>
+          <ol class="next-steps">
+            <li>We look at your property and how it's managed today.</li>
+            <li>We get in touch to talk it through.</li>
+            <li>If it's a fit, we send you an agreement to review.</li>
+          </ol>
+        </div>
+      </div>
+      <form class="lead-form" id="c-form" novalidate aria-labelledby="contact-title">
+        <p class="preview-note">Preview: this form checks your details, but it isn't connected yet, so nothing is sent.</p>
+        <div class="row two">
+          <div class="field">
+            <label for="c-first">First name</label>
+            <input id="c-first" name="first_name" autocomplete="given-name" required data-msg="Enter your first name." aria-describedby="c-first-err">
+            <p class="err" id="c-first-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="c-last">Last name</label>
+            <input id="c-last" name="last_name" autocomplete="family-name" required data-msg="Enter your last name." aria-describedby="c-last-err">
+            <p class="err" id="c-last-err" hidden></p>
+          </div>
+        </div>
+        <fieldset>
+          <legend>Property address</legend>
+          <div class="field">
+            <label for="c-street">Street address</label>
+            <input id="c-street" name="street" autocomplete="address-line1" required data-msg="Enter the street address." aria-describedby="c-street-err">
+            <p class="err" id="c-street-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="c-unit">Unit or apartment <span class="opt">(optional)</span></label>
+            <input id="c-unit" name="unit" autocomplete="address-line2">
+          </div>
+          <div class="row three">
+            <div class="field">
+              <label for="c-city">City</label>
+              <input id="c-city" name="city" autocomplete="address-level2" required data-msg="Enter the city." aria-describedby="c-city-err">
+              <p class="err" id="c-city-err" hidden></p>
+            </div>
+            <div class="field">
+              <label for="c-state">State</label>
+              <input id="c-state" name="state" autocomplete="address-level1" maxlength="20" required data-msg="Enter the state." aria-describedby="c-state-err">
+              <p class="err" id="c-state-err" hidden></p>
+            </div>
+            <div class="field">
+              <label for="c-zip">ZIP code</label>
+              <input id="c-zip" name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="10" required data-msg="Enter the ZIP code." data-check="zip" aria-describedby="c-zip-err">
+              <p class="err" id="c-zip-err" hidden></p>
+            </div>
+          </div>
+        </fieldset>
+        <div class="row two">
+          <div class="field">
+            <label for="c-email">Email</label>
+            <input id="c-email" name="email" type="email" autocomplete="email" required data-msg="Enter your email address." data-check="email" aria-describedby="c-email-err">
+            <p class="err" id="c-email-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="c-phone">Phone</label>
+            <input id="c-phone" name="phone" type="tel" autocomplete="tel" required data-msg="Enter your phone number." data-check="phone" aria-describedby="c-phone-err">
+            <p class="err" id="c-phone-err" hidden></p>
+          </div>
+        </div>
+        <div class="row two">
+          <div class="field">
+            <label for="c-units">Number of units <span class="opt">(optional)</span></label>
+            <select id="c-units" name="units">
+              <option value="">Choose</option>
+              <option value="1">1, a single-family home</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5+">5 or more</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="c-notes">Anything else we should know? <span class="opt">(optional)</span></label>
+          <textarea id="c-notes" name="notes" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+        <p class="form-status" id="c-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div style="display: grid; gap: 10px">
+      <span class="brand-name">Zuo <span class="brand-sub">Property Management</span></span>
+      <p>Repair-first property management for single-family rentals and multi-family rentals with up to four units. Available in New York City, the Tri-State area and the Atlanta area. Coming soon across the U.S.</p>
+    </div>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href="#home">Home</a>
+      <a href="#about">About us</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <p class="fine">© 2026 Zuo Property Management</p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  const PAGES = ["home", "about", "pricing", "contact"];
+  const RATES = { base: 0.06, share: 0.25, ceiling: 0.75 };
+  const $ = (id) => document.getElementById(id);
+
+  const fmt = (n) => {
+    const c = Math.round(n * 100) / 100;
+    const hasCents = Math.abs(c - Math.trunc(c)) > 0.001;
+    return "$" + c.toLocaleString("en-US", { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 });
+  };
+  const num = (el) => {
+    const v = parseFloat(el.value);
+    return Number.isFinite(v) ? v : NaN;
+  };
+
+  /* ---------- Pages ---------- */
+  function showPage(id, moveFocus) {
+    const target = PAGES.includes(id) ? id : "home";
+    PAGES.forEach((p) => { $("page-" + p).hidden = p !== target; });
+    document.querySelectorAll("[data-nav]").forEach((a) => {
+      if (a.dataset.nav === target) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+    if (moveFocus) {
+      window.scrollTo(0, 0);
+      const heading = document.querySelector("#page-" + target + " h1");
+      if (heading) heading.focus({ preventScroll: true });
+    }
+  }
+  window.addEventListener("hashchange", () => showPage(location.hash.slice(1), true));
+  showPage(location.hash.slice(1), false);
+
+  /* ---------- Pricing math ---------- */
+  const priceMath = (low, high, paid) => {
+    const mid = (low + high) / 2;
+    const ceil = low + RATES.ceiling * (high - low);
+    const saved = Math.max(0, mid - paid);
+    const share = saved * RATES.share;
+    return { mid, ceil, saved, share, keep: saved - share, within: paid <= ceil };
+  };
+
+  const placeLabel = (el, pct) => {
+    el.style.left = pct + "%";
+    el.style.transform = pct < 14 ? "translateX(0)" : pct > 86 ? "translateX(-100%)" : "translateX(-50%)";
+  };
+
+  const calc = {
+    low: $("calc-low"), high: $("calc-high"), paid: $("calc-paid"), slider: $("calc-slider"),
+    msg: $("calc-msg"), dot: $("calc-dot"), dotLabel: $("calc-dot-label"),
+    endLow: $("calc-end-low"), endHigh: $("calc-end-high"),
+    mid: $("calc-mid"), ceil: $("calc-ceil"), saved: $("calc-saved"),
+    share: $("calc-share"), keep: $("calc-keep"), status: $("calc-status"),
+    tickMid: $("calc-tick-mid"), tickCeil: $("calc-tick-ceil"), band: $("calc-band"),
+  };
+
+  function updateCalc(fromSlider) {
+    if (fromSlider) calc.paid.value = calc.slider.value;
+    const low = num(calc.low);
+    const high = num(calc.high);
+    const paid = num(calc.paid);
+    if (!(low >= 0) || !(high > low)) {
+      calc.msg.textContent = "Enter a high end that is more than the low end.";
+      calc.msg.hidden = false;
+      return;
+    }
+    if (!(paid >= 0)) {
+      calc.msg.textContent = "Enter the price paid.";
+      calc.msg.hidden = false;
+      return;
+    }
+    calc.msg.hidden = true;
+    calc.slider.min = String(Math.floor(low * 0.05) * 10);
+    calc.slider.max = String(Math.ceil(high * 0.115) * 10);
+    if (!fromSlider) calc.slider.value = String(paid);
+
+    const r = priceMath(low, high, paid);
+    calc.mid.textContent = fmt(r.mid);
+    calc.ceil.textContent = fmt(r.ceil);
+    calc.tickMid.textContent = fmt(r.mid);
+    calc.tickCeil.textContent = fmt(r.ceil);
+    calc.saved.textContent = r.saved > 0 ? fmt(r.saved) : "None";
+    calc.share.textContent = fmt(r.share);
+    calc.keep.textContent = fmt(r.keep);
+    calc.endLow.textContent = fmt(low);
+    calc.endHigh.textContent = fmt(high);
+
+    const pct = Math.min(100, Math.max(0, ((paid - low) / (high - low)) * 100));
+    calc.dot.style.left = pct + "%";
+    calc.band.style.left = pct + "%";
+    calc.band.style.width = Math.max(0, 50 - pct) + "%";
+    placeLabel(calc.dotLabel, pct);
+    calc.dotLabel.textContent = "Paid " + fmt(paid);
+    calc.status.textContent = r.within ? "Within the price guarantee" : "Above the price guarantee";
+    calc.status.className = "pill " + (r.within ? "ok" : "over");
+  }
+  [calc.low, calc.high, calc.paid].forEach((el) => el.addEventListener("input", () => updateCalc(false)));
+  calc.slider.addEventListener("input", () => updateCalc(true));
+  updateCalc(false);
+
+  const rent = $("rent");
+  rent.addEventListener("input", () => {
+    const r = num(rent);
+    const month = r > 0 ? r * RATES.base : 0;
+    $("rent-month").textContent = fmt(month);
+    $("rent-year").textContent = fmt(month * 12);
+  });
+
+  /* ---------- Contact forms ---------- */
+  const checks = {
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Enter an email address like name@example.com.",
+    phone: (v) => v.replace(/\D/g, "").length >= 10 || "Enter a phone number with at least 10 digits.",
+    zip: (v) => /^\d{5}(-\d{4})?$/.test(v) || "Enter a 5-digit ZIP code.",
+  };
+
+  function validate(el) {
+    const v = el.value.trim();
+    let msg = "";
+    if (el.required && !v) {
+      msg = el.dataset.msg || "Fill in this field.";
+    } else if (v && el.dataset.check && checks[el.dataset.check]) {
+      const result = checks[el.dataset.check](v);
+      if (result !== true) msg = result;
+    }
+    const err = $(el.id + "-err");
+    if (err) {
+      err.textContent = msg;
+      err.hidden = !msg;
+    }
+    if (msg) el.setAttribute("aria-invalid", "true");
+    else el.removeAttribute("aria-invalid");
+    return !msg;
+  }
+
+  document.querySelectorAll("form.lead-form").forEach((form) => {
+    const status = form.querySelector(".form-status");
+    const fields = Array.from(form.querySelectorAll("input, select, textarea"));
+    fields.forEach((el) => {
+      el.addEventListener("blur", () => {
+        if (el.value.trim() || el.hasAttribute("aria-invalid")) validate(el);
+      });
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      let firstBad = null;
+      fields.forEach((el) => {
+        if (!validate(el) && !firstBad) firstBad = el;
+      });
+      if (firstBad) {
+        status.dataset.state = "error";
+        status.textContent = "Some details need fixing. Check the messages under the fields.";
+        firstBad.focus();
+        return;
+      }
+      const first = form.querySelector('[name="first_name"]').value.trim();
+      status.dataset.state = "done";
+      status.textContent = "Thanks, " + first + ". This preview isn't connected yet, so your details were not sent.";
+    });
+  });
+})();
+</script>
