@@ -384,6 +384,7 @@ p { margin: 0; text-wrap: pretty; }
 @media (max-width: 760px) { .outcomes { grid-template-columns: minmax(0, 1fr); } }
 .demo { display: grid; gap: 8px; align-content: center; min-height: 172px; padding: 16px; border-radius: 10px; background: var(--tint); font-size: 0.86rem; line-height: 1.4; }
 .demo-head { display: flex; justify-content: space-between; gap: 12px; font-size: 0.78rem; font-weight: 650; color: var(--muted); }
+.demo-head span:last-child { flex: none; white-space: nowrap; }
 .qrow { display: grid; grid-template-columns: 1.1rem minmax(0, 1fr) 4.4rem; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
 .qrow b { text-align: right; }
 .qrow i { position: relative; display: block; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
@@ -544,8 +545,14 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
 .login-dialog { width: min(440px, calc(100% - 32px)); padding: 0; border: 0; border-radius: 16px; background: var(--card); color: var(--ink); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.6); }
 .login-dialog::backdrop { background: rgba(6, 12, 20, 0.6); }
 .login-inner { display: grid; gap: 16px; padding: 28px; }
-.login-inner h2 { font-size: 1.7rem; }
-.login-inner p { color: var(--muted); }
+.login-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; }
+.login-inner h2 { font-size: 1.5rem; }
+.login-inner > p { color: var(--muted); }
+.login-close { flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin: -8px -10px 0 0; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; }
+.login-close:hover { color: var(--ink); background: var(--tint); }
+.login-form { display: grid; gap: 14px; }
+.login-form .btn { width: 100%; }
+.login-form .form-status { min-height: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -591,7 +598,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     <div class="hero-copy">
       <p class="kicker">For owners of single-family rentals and multi-family rentals with up to four units</p>
       <h1 id="home-title" tabindex="-1">We handle every repair on your rental, and make every dollar count.</h1>
-      <p class="lede">Our AI answers your tenants at any hour, works out what's wrong, and does the legwork to find you 3 competitive quotes. You approve repairs by text, with the quotes side by side. We never mark up a repair bill, and we only earn extra when we save you money.</p>
+      <p class="lede">Many property managers earn more when your repairs cost more, because they take a cut of each bill. We earn more only when your repairs cost less. When a repair comes in under the published benchmark price for that job in your area, we split the saving with you 50/50. Our base fee is 6% of the rent, while a typical manager charges 10% to 12%.</p>
       <div class="actions">
         <a class="btn btn-lamp" href="#contact">Tell us about your property</a>
         <a class="btn btn-ghost" href="#pricing">See pricing</a>
@@ -609,15 +616,15 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       <div class="thread-viewport">
         <ol class="thread" id="thread">
           <li class="day">Tuesday</li>
-          <li class="msg">Your tenant reported water under the water heater. Our AI walked them through shutting off its water supply. Nothing is needed from you tonight.<time>2:14 AM</time></li>
-          <li class="msg">The tank is failing and needs replacing. We got 3 quotes, and Hansen checked each one against Angi's typical range of $882 to $1,826.
+          <li class="msg">Your tenant reported water under the water heater. Our AI Property Manager walked them through shutting off its water supply. Nothing is needed from you tonight.<time>2:14 AM</time></li>
+          <li class="msg">The tank is failing and needs replacing. We got 3 quotes, and Hansen checked each one against the published benchmark price for that job in your area, $882 to $1,826.
             <span class="quotes"><span class="best"><span>Quote A</span><span>$1,150</span></span><span><span>Quote B</span><span>$1,320</span></span><span><span>Quote C</span><span>$1,480</span></span></span>
             <time>9:05 AM</time></li>
           <li class="msg">Hansen recommends quote A: $1,150, which is $204 under the benchmark. Reply YES to approve.<time>9:06 AM</time></li>
           <li class="msg out">YES<time>9:12 AM</time></li>
           <li class="msg">Approved. The plumber is booked for Wednesday at 1 PM, and your tenant confirmed the time.<time>9:14 AM</time></li>
           <li class="day">Wednesday</li>
-          <li class="msg">Fixed. Your tenant confirmed there's hot water again. The invoice and photos are on your statement. You saved $204 against the benchmark, and you keep $153.<time>3:10 PM</time></li>
+          <li class="msg">Fixed. Your tenant confirmed there's hot water again. The invoice and photos are on your statement. You saved $204 against the benchmark, and you keep $102.<time>3:10 PM</time></li>
         </ol>
       </div>
       <div class="phone-input" aria-hidden="true">Text message</div>
@@ -631,13 +638,13 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       <h2 class="mission-label" id="mission-title">Our mission</h2>
       <div>
         <p class="mission-statement">Zuo handles every repair on your rental, at any hour, at a fair price, and shows you every step.</p>
-        <p class="mission-sub">Hansen Zuo, our founder, checks every recommendation our AI makes before it reaches you.</p>
+        <p class="mission-sub">Hansen Zuo, our founder and owner, checks every recommendation our AI Property Manager makes before it reaches you.</p>
       </div>
     </div>
     <ul class="rules">
       <li><h3>Every number is shown</h3><p>Quotes, invoices, and the public price range for each job.</p></li>
       <li><h3>No markups</h3><p>We never add to a repair bill or take a fee from a vendor.</p></li>
-      <li><h3>Hansen checks the AI's work</h3><p>Our AI handles the routine work. Hansen checks its recommendations and handles anything urgent.</p></li>
+      <li><h3>Hansen checks the AI Property Manager's work</h3><p>Our AI Property Manager handles the routine work. Hansen checks its recommendations and handles anything urgent.</p></li>
     </ul>
   </div>
 </section>
@@ -646,38 +653,33 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
   <div class="wrap">
     <div class="section-head">
       <h2 id="problems-title">What owners put up with, and what we do instead</h2>
-      <p>Our founder has used a property manager for his own rental since 2021. This is what he saw, and what Zuo does about it.</p>
+      <p>Our founder has used a property manager for his own rental since 2017. This is what he saw, and what Zuo does about it.</p>
     </div>
     <table class="fix-table">
       <thead>
-        <tr><th scope="col">The problem</th><th scope="col">What Zuo does</th><th scope="col">At our founder's rental</th></tr>
+        <tr><th scope="col">The problem</th><th scope="col">At our founder's rental</th><th scope="col">What Zuo does</th></tr>
       </thead>
       <tbody>
         <tr>
-          <th scope="row">Quotes are passed along with little checking</th>
-          <td data-label="What Zuo does">Jobs above an amount you set get 3 competitive quotes. Each one is checked against Angi's typical price range, and Hansen checks our AI's recommendation.</td>
-          <td class="seen" data-label="At our founder's rental">Three vendors got three-quarters of his repair spending.</td>
+          <th scope="row">Quotes are passed along with little vetting by humans</th>
+          <td class="seen" data-label="At our founder's rental">His manager overcharged him by 78% by not shopping around. Its "best price" to clean his gutters was $375. Our AI Property Manager found a cleaner for $100, and he vetted it.</td>
+          <td data-label="What Zuo does">Jobs above an amount you set get 3 competitive quotes. Each one is checked against the published benchmark price for that job in your area. Hansen checks our AI Property Manager's recommendation.</td>
         </tr>
         <tr>
           <th scope="row">Repairs drag on</th>
-          <td data-label="What Zuo does">Our AI answers tenants at any hour, books the vendor around their schedule, and sends updates until the job is done.</td>
-          <td class="seen" data-label="At our founder's rental">A repair took a median of 15 days to finish after he approved it. We counted to the day the bill was paid, across 5 repairs.</td>
+          <td class="seen" data-label="At our founder's rental">A repair took a median of 15 days to finish after he approved it.</td>
+          <td data-label="What Zuo does">Our AI Property Manager answers tenants at any hour, books the vendor around their schedule, and sends updates until the job is done.</td>
         </tr>
         <tr>
           <th scope="row">Fees add up past what the agreement says</th>
-          <td data-label="What Zuo does">One base fee of 6% of the monthly base rent, plus 25% of what we save you on a repair. There are no other fees.</td>
           <td class="seen" data-label="At our founder's rental">The agreement said 8%. Once every fee was added up, he paid almost 11% of the rent.</td>
-        </tr>
-        <tr>
-          <th scope="row">Every problem lands on your phone</th>
-          <td data-label="What Zuo does">Problems come to us first. You hear from us only when a decision needs you, and you approve by text.</td>
-          <td class="seen" data-label="At our founder's rental">This part worked. His manager kept problems away from him, and he valued that, so Zuo keeps it.</td>
+          <td data-label="What Zuo does">One base fee of 6% of the monthly base rent, plus half of what we save you on a repair. There are no other fees.</td>
         </tr>
       </tbody>
     </table>
     <div class="leave">
-      <h3>What we leave to others</h3>
-      <p>Leasing. Licensed local realtors find your tenants and bill you directly, or a tenant can use their own agent. We also keep no in-house repair crew, and we never take a fee from a vendor.</p>
+      <h3>Our partners</h3>
+      <p>Leasing. We partner with licensed local realtors, who find your tenants and bill you directly. A landlord can also use their own agent. We also keep no in-house repair crew, and we never take a fee from a vendor.</p>
     </div>
   </div>
 </section>
@@ -689,8 +691,8 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     </div>
     <ol class="steps">
       <li><h3>Your tenant reports the problem</h3><p>By text, phone call or photo, at any hour.</p></li>
-      <li><h3>Our AI works out what's wrong</h3><p>It asks the right questions and walks the tenant through simple fixes. Real emergencies go straight to Hansen.</p></li>
-      <li><h3>We get 3 quotes, and Hansen checks them</h3><p>Each quote is compared with the job's typical price range on Angi.</p></li>
+      <li><h3>Our AI Property Manager works out what's wrong</h3><p>It asks the right questions and walks the tenant through simple fixes. Real emergencies go straight to Hansen.</p></li>
+      <li><h3>We get 3 quotes, and Hansen checks them</h3><p>Each quote is compared with the published benchmark price for that job in your area.</p></li>
       <li><h3>You approve by text</h3><p>You see the quotes side by side, with Hansen's recommendation. Small jobs under an amount you set go ahead without asking you.</p></li>
       <li><h3>The job is done and checked</h3><p>Your tenant confirms the fix, and you get the invoice with before and after photos.</p></li>
     </ol>
@@ -705,20 +707,20 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     <div class="outcomes">
       <article class="outcome">
         <div class="demo" aria-hidden="true">
-          <div class="demo-head"><span>Replace the tank water heater</span><span>Angi: $882 to $1,826</span></div>
+          <div class="demo-head"><span>Replace the tank water heater</span><span>Benchmark: $882 to $1,826</span></div>
           <div class="qrow best"><span>A</span><i style="--w: 28%"></i><b>$1,150</b></div>
           <div class="qrow"><span>B</span><i style="--w: 46%"></i><b>$1,320</b></div>
           <div class="qrow"><span>C</span><i style="--w: 63%"></i><b>$1,480</b></div>
         </div>
         <div class="outcome-body">
           <h3>Every price checked</h3>
-          <p>Each quote is compared with the job's typical price range on Angi, so you can check it yourself.</p>
+          <p>Each quote is compared with the published benchmark price for that job in your area, so you can check it yourself.</p>
         </div>
         <p class="metric"><b>3</b><span>competitive quotes on every job above the amount you set</span></p>
       </article>
       <article class="outcome">
         <div class="demo" aria-hidden="true">
-          <div class="demo-head"><span>Your tenant and our AI</span><span>Tuesday, 2:14 AM</span></div>
+          <div class="demo-head"><span>Your tenant and our AI Property Manager</span><span>Tuesday, 2:14 AM</span></div>
           <p class="b">There's water on the floor by the water heater.</p>
           <p class="b mine">Let's stop it first. Turn the valve on the cold-water pipe at the top of the heater to off, and tell me when it's done.</p>
           <p class="b">Done.</p>
@@ -727,7 +729,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
           <h3>Answers at any hour</h3>
           <p>Your tenant gets help right away, and real emergencies go straight to Hansen.</p>
         </div>
-        <p class="metric"><b>Minutes</b><span>for our AI to answer your tenant, day or night</span></p>
+        <p class="metric"><b>Minutes</b><span>for our AI Property Manager to answer your tenant, day or night</span></p>
       </article>
       <article class="outcome">
         <div class="demo" aria-hidden="true">
@@ -749,15 +751,15 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
             <div><dt>Benchmark</dt><dd>$1,354</dd></div>
             <div><dt>Price paid</dt><dd>$1,150</dd></div>
             <div><dt>Saving</dt><dd>$204</dd></div>
-            <div><dt>Our share, 25%</dt><dd>$51</dd></div>
-            <div class="keep"><dt>You keep</dt><dd>$153</dd></div>
+            <div><dt>Our share, 50%</dt><dd>$102</dd></div>
+            <div class="keep"><dt>You keep</dt><dd>$102</dd></div>
           </dl>
         </div>
         <div class="outcome-body">
-          <h3>You keep most of what we save</h3>
+          <h3>We split every saving with you</h3>
           <p>We never mark up a bill or take a fee from a vendor. Every job's numbers are on your statement.</p>
         </div>
-        <p class="metric"><b>75%</b><span>of every dollar saved is yours</span></p>
+        <p class="metric"><b>50/50</b><span>split of every dollar we save you</span></p>
       </article>
     </div>
     <p class="terms-note">Zuo is new, so these are the terms we commit to, not results from past customers. The water heater is an example.</p>
@@ -785,12 +787,12 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     <div class="pricing-grid">
       <div class="pricing-copy">
         <h2 id="pricing-title">One base fee, and a share of what we save you</h2>
-        <p>You pay a base fee of 6% of the monthly base rent. When we get a repair done for less than its benchmark price, you keep 75% of the saving and we earn 25%. There are no other fees.</p>
+        <p>You pay a base fee of 6% of the monthly base rent. When we get a repair done for less than its benchmark price, we split the saving with you 50/50. There are no other fees.</p>
         <dl class="fees">
           <div>
             <dt>6%</dt>
             <dd>
-              <p><b>Base fee.</b> 6% of the monthly base rent. It covers tenant messages at any hour, repairs and vendors, rent collection and your monthly statement.</p>
+              <p><b>Base fee.</b> 6% of the monthly base rent. It covers tenant messages at any hour, repairs and vendors, rent collection and your monthly statement. A typical manager charges 10% to 12% for a single-family home, according to <a href="https://homeguide.com/costs/property-management-fees" target="_blank" rel="noopener">HomeGuide</a>.</p>
               <div class="mini-calc">
                 <label for="rent">Your monthly rent</label>
                 <div class="money-input"><span aria-hidden="true">$</span><input id="rent" type="number" inputmode="decimal" min="0" step="50" value="2000"></div>
@@ -799,14 +801,14 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
             </dd>
           </div>
           <div>
-            <dt>25%</dt>
-            <dd><p><b>Repair savings.</b> For each repair, we look up the job's typical price range on Angi. The middle of that range is the benchmark. If the price comes in below the benchmark, you keep 75% of the difference and we earn 25%. If it doesn't, we earn nothing on that repair.</p></dd>
+            <dt>50%</dt>
+            <dd><p><b>Repair savings.</b> For each repair, we look up the published benchmark price for that job in your area. It's published as a range, and we use the middle of it. If the price comes in below that, we split the difference with you 50/50. If it doesn't, we earn nothing on that repair.</p></dd>
           </div>
           <div>
             <dt>75%</dt>
             <dd>
-              <p><b>Price guarantee.</b> No repair will cost you more than the point 75% of the way up Angi's typical range.</p>
-              <p class="formula">Price guarantee = low end + 75% × (high end − low end)</p>
+              <p><b>Price guarantee.</b> No repair will cost you more than the point 75% of the way up the published benchmark price for that job in your area.</p>
+              <p>For a job priced at $882 to $1,826, you never pay more than $1,590.</p>
             </dd>
           </div>
         </dl>
@@ -814,7 +816,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
 
       <div class="calc-card">
         <h3>See how a repair is priced</h3>
-        <p>Enter a job's typical range from Angi and the price paid. The example is Angi's range for replacing a tank water heater.</p>
+        <p>Enter the published benchmark price range for a job and the price paid. The example is the range for replacing a tank water heater.</p>
         <div class="calc-inputs">
           <div class="field">
             <label for="calc-low">Low end of range</label>
@@ -849,11 +851,11 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
           <div><dt>Benchmark: the middle of the range</dt><dd id="calc-mid">$1,354</dd></div>
           <div><dt>Price guarantee: never above</dt><dd id="calc-ceil">$1,590</dd></div>
           <div class="save-row"><dt>Saving vs. benchmark</dt><dd id="calc-saved">$204</dd></div>
-          <div><dt>Our share, 25%</dt><dd id="calc-share">$51</dd></div>
-          <div class="total"><dt>You keep</dt><dd id="calc-keep">$153</dd></div>
+          <div><dt>Our share, 50%</dt><dd id="calc-share">$102</dd></div>
+          <div class="total"><dt>You keep</dt><dd id="calc-keep">$102</dd></div>
         </dl>
         <p><span class="pill ok" id="calc-status">Within the price guarantee</span></p>
-        <p class="source">The example range is from <a href="https://www.angi.com/articles/how-much-does-water-heater-installation-cost.htm" target="_blank" rel="noopener">Angi's national guide to water heater replacement</a>, updated October 16, 2026. The price paid is an example.</p>
+        <p class="source">The example range is from <a href="https://www.angi.com/articles/how-much-does-water-heater-installation-cost.htm" target="_blank" rel="noopener">a published national cost guide for water heater replacement</a>, updated October 16, 2026. The price paid is an example.</p>
       </div>
     </div>
 
@@ -866,7 +868,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
           <li>Setup fees</li>
           <li>Lease renewal fees</li>
           <li>Monthly admin fees</li>
-          <li>Leasing fees. Licensed local realtors find your tenants and bill you directly.</li>
+          <li>Leasing fees. Our partner realtors find your tenants and bill you directly.</li>
         </ul>
       </div>
       <div>
@@ -877,8 +879,8 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
 
     <div class="faq">
       <div><h3>What counts as a saving?</h3><p>Only finished repairs. The saving is the benchmark price minus the price you paid. A skipped or delayed repair never counts.</p></div>
-      <div><h3>Which cost guide do you use?</h3><p>Angi, formerly Angie's List. Its cost guides are free, so you can check any price yourself. Every repair statement names the Angi page and shows the range.</p></div>
-      <div><h3>Who handles leasing?</h3><p>Licensed local realtors find tenants and bill you directly. A tenant can also use their own agent.</p></div>
+      <div><h3>Which cost guide do you use?</h3><p>The published benchmark price for that job in your area, from free public cost guides, so you can check any price yourself. Every repair statement names the guide and shows the range.</p></div>
+      <div><h3>Who handles leasing?</h3><p>We partner with licensed local realtors, who find tenants and bill you directly. A landlord can also use their own agent.</p></div>
       <div><h3>Where do you work?</h3><p>New York City, the Tri-State area and the Atlanta area.</p></div>
     </div>
   </div>
@@ -891,7 +893,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       <p class="lede">Zuo Property Management is run by me, Hansen Zuo. I own a rental home in the Atlanta area and manage it from New York. I've spent my career building software that makes fast, careful decisions at scale.</p>
       <div class="story">
         <h3>I'm a landlord too</h3>
-        <p>I've used a property manager for my rental since 2021. They kept problems away from me, and I valued that.</p>
+        <p>I've used a property manager for my rental since 2017. They kept problems away from me, and I valued that.</p>
         <p>Repairs were the problem. Quotes were passed along with little checking. Three vendors got three-quarters of my repair spending. When a tenant moved out, the house sat empty for 40 days. Once every fee was added up, I paid almost 11% of the rent. The agreement said 8%.</p>
         <p>I started Zuo to run repairs the way I want them run for my own home: every quote checked, every dollar shown, and no markup on any bill.</p>
       </div>
@@ -899,12 +901,9 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     <div>
       <h3>What I bring</h3>
       <ul class="bring">
-        <li><b>Replacing slow manual review</b><p>At Meta, I drove the design of a multi-agent AI system that replaced human review. It cut review volume by 60% and the time to a decision from 23 hours to 2 hours.</p></li>
-        <li><b>Stopping account takeovers</b><p>I owned Meta's end-to-end strategy against advertiser account takeover fraud, cutting revenue loss by $400 million a year. I bring the same care to spotting fake invoices and rental scams.</p></li>
-        <li><b>Billing for 100 million subscribers</b><p>At LotusFlare, I built billing for a platform with more than 100 million subscribers, including proration, dunning (the reminders that chase unpaid bills) and invoicing. Rent, late notices and owner statements are the same kind of work.</p></li>
-        <li><b>Products for home sellers</b><p>At Realtor.com, a site with 63 million users, I conceived and validated the home-seller marketplace concept behind its partnership with Opendoor.</p></li>
-        <li><b>An AI agent for maintenance</b><p>I've built an AI agent that sorts tenants' maintenance requests and books vendors.</p></li>
-        <li><b>Engineering and business</b><p>MBA from the University of Michigan's Ross School of Business (2018). Bachelor of Engineering from the University of Toronto (2012).</p></li>
+        <li><b>AI agents for complex investigations</b><p>At Meta, I built AI agents for complex investigative workflows. They cut review volume by 60% and the time to a decision from 23 hours to 2 hours.</p></li>
+        <li><b>Delightful experiences for homeowners</b><p>At Realtor.com, I built delightful experiences for homeowners, such as a feature that shows homeowners how much their home is worth without listing it.</p></li>
+        <li><b>A remote landlord since 2017</b><p>I've been a remote landlord since 2017, managing properties in Toronto and Atlanta from New York.</p></li>
       </ul>
     </div>
   </div>
@@ -1023,14 +1022,29 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
 </footer>
 
 <dialog class="login-dialog" id="login" aria-labelledby="login-title">
-  <form method="dialog" class="login-inner">
-    <h2 id="login-title">Owner login</h2>
-    <p>Owner accounts open with our first owners. Once yours is open, you'll see every repair in one place: your tenant's photos, the quotes, which vendor we picked and why, the invoice, and photos of the finished work.</p>
-    <div class="actions">
-      <a class="btn btn-lamp" href="#contact" id="login-cta">Tell us about your property</a>
-      <button class="btn btn-quiet" value="close">Close</button>
+  <div class="login-inner">
+    <div class="login-head">
+      <h2 id="login-title">Log in to your owner account</h2>
+      <button type="button" class="login-close" id="login-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
     </div>
-  </form>
+    <form class="login-form" id="login-form" novalidate aria-labelledby="login-title">
+      <div class="field">
+        <label for="l-email">Email</label>
+        <input id="l-email" name="username" type="email" autocomplete="username" autofocus required data-msg="Enter your email address." data-check="email" aria-describedby="l-email-err">
+        <p class="err" id="l-email-err" hidden></p>
+      </div>
+      <div class="field">
+        <label for="l-pass">Password</label>
+        <input id="l-pass" name="password" type="password" autocomplete="current-password" required data-msg="Enter your password." aria-describedby="l-pass-err">
+        <p class="err" id="l-pass-err" hidden></p>
+      </div>
+      <button class="btn btn-lamp" type="submit">Log in</button>
+      <p class="form-status" id="login-status" role="status" aria-live="polite"></p>
+    </form>
+    <p>New to Zuo? <a href="#contact" id="login-cta">Tell us about your property</a>.</p>
+  </div>
 </dialog>
 
 <script>
@@ -1038,7 +1052,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
   "use strict";
   const $ = (id) => document.getElementById(id);
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const RATES = { base: 0.06, share: 0.25, ceiling: 0.75 };
+  const RATES = { base: 0.06, share: 0.5, ceiling: 0.75 };
 
   const fmt = (n) => {
     const c = Math.round(n * 100) / 100;
@@ -1162,15 +1176,18 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
   nav.addEventListener("click", (e) => { if (e.target.closest("a")) closeMenu(); });
 
   const dialog = $("login");
+  const closeLogin = () => {
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
+  };
   document.querySelectorAll("[data-login]").forEach((b) => b.addEventListener("click", () => {
     closeMenu();
+    $("login-status").textContent = "";
     if (typeof dialog.showModal === "function") dialog.showModal();
     else dialog.setAttribute("open", "");
   }));
-  $("login-cta").addEventListener("click", () => {
-    if (typeof dialog.close === "function") dialog.close();
-    else dialog.removeAttribute("open");
-  });
+  $("login-cta").addEventListener("click", closeLogin);
+  $("login-close").addEventListener("click", closeLogin);
 
   const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
   if ("IntersectionObserver" in window) {
@@ -1311,6 +1328,29 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       status.dataset.state = "done";
       status.textContent = "Thanks, " + first + ". This preview isn't connected yet, so your details were not sent.";
     });
+  });
+
+  /* ---------- Owner log-in: checks the fields, then sends and keeps nothing ---------- */
+  const loginFields = [$("l-email"), $("l-pass")];
+  loginFields.forEach((el) => {
+    el.addEventListener("blur", () => {
+      if (el.value.trim() || el.hasAttribute("aria-invalid")) validate(el);
+    });
+  });
+  $("login-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const status = $("login-status");
+    let firstBad = null;
+    loginFields.forEach((el) => {
+      if (!validate(el) && !firstBad) firstBad = el;
+    });
+    if (firstBad) {
+      status.textContent = "";
+      firstBad.focus();
+      return;
+    }
+    $("l-pass").value = "";
+    status.textContent = "Owner accounts aren't open yet, so we can't log you in. Nothing you typed was sent or saved.";
   });
 })();
 </script>
