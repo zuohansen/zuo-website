@@ -23,9 +23,19 @@ const LIMITS = {
 const REQUIRED = ["first_name", "last_name", "street", "city", "state", "zip", "email", "phone"];
 const UNITS = ["", "1", "2", "3", "4", "5+"];
 
+// Short links for each outreach channel. Each one opens the home page with tags that analytics reads, so you can
+// see which channel each visitor came from. To add a channel, add a line here.
+const CHANNELS = {
+  "/letter": "utm_source=letter&utm_medium=mail",
+  "/realtor": "utm_source=realtor&utm_medium=referral",
+  "/friend": "utm_source=network&utm_medium=referral",
+};
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const channel = CHANNELS[url.pathname.replace(/\/+$/, "").toLowerCase()];
+    if (channel) return Response.redirect(`${url.origin}/?${channel}`, 302);
     if (url.pathname === "/api/contact") {
       if (request.method !== "POST") return reply({ ok: false, error: "Use POST." }, 405);
       return contact(request, env, ctx);

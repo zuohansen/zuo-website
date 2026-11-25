@@ -2,6 +2,20 @@
 <title>Zuo Property Management</title>
 <link rel="canonical" href="https://zuopropertymanagement.com/">
 <script>/* The old GitHub Pages copy sends visitors to the real site. */ if (/\.github\.io$/.test(location.hostname)) location.replace("https://zuopropertymanagement.com/" + location.hash);</script>
+<script>
+/* Analytics (PostHog), on the real site only. Recordings leave out the contact and log-in forms entirely,
+   and nothing anyone types is recorded. */
+if (/(^|\.)zuopropertymanagement\.com$/.test(location.hostname)) {
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group startSessionRecording stopSessionRecording".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init("phc_khMsPJ73JuxdM8eiqrKekXU2C3fpypFBqDSEwEpiifs2", {
+    api_host: "https://us.i.posthog.com",
+    person_profiles: "identified_only",
+    capture_pageview: true,
+    capture_pageleave: true,
+    session_recording: { maskAllInputs: true, blockSelector: ".lead-form, .login-form" },
+  });
+}
+</script>
 <meta name="description" content="Repair-first property management for single-family rentals and multi-family rentals with up to four units, in New York City, the Tri-State area and the Atlanta area.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1026,7 +1040,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
     </nav>
-    <p class="fine">© 2026 Zuo Property Management</p>
+    <p class="fine">© 2026 Zuo Property Management. We use analytics cookies to see how visitors use this page, so we can improve it.</p>
   </div>
 </footer>
 
@@ -1060,6 +1074,10 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
+  // Named analytics events. Does nothing where PostHog isn't loaded (the preview, GitHub, local copies).
+  const track = (name, props) => { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); };
+  const tracked = new Set();
+  const trackOnce = (name, props) => { if (!tracked.has(name)) { tracked.add(name); track(name, props); } };
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const RATES = { base: 0.06, share: 0.5, ceiling: 0.75 };
 
@@ -1339,10 +1357,13 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       if (firstBad) {
         status.dataset.state = "error";
         status.textContent = "Some details need fixing. Check the messages under the fields.";
+        track("form_error", { fields: fields.filter((el) => el.hasAttribute("aria-invalid")).map((el) => el.name) });
         firstBad.focus();
         return;
       }
       const first = form.querySelector('[name="first_name"]').value.trim();
+      // Only the state and number of units go to analytics, never names or contact details.
+      const leadFacts = { state: form.querySelector('[name="state"]').value.trim().toUpperCase().slice(0, 20), units: form.querySelector('[name="units"]').value || "not given" };
       if (!formLive) {
         status.dataset.state = "done";
         status.textContent = "Thanks, " + first + ". This preview isn't connected yet, so your details were not sent.";
@@ -1364,7 +1385,9 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
         form.reset();
         status.dataset.state = "done";
         status.textContent = "Thanks, " + first + ". We have your details, and we'll be in touch soon.";
+        track("form_sent", leadFacts);
       } catch (err) {
+        track("form_failed", leadFacts);
         status.dataset.state = "error";
         status.textContent = "We couldn't send your details. Check your connection and try again.";
       } finally {
@@ -1394,6 +1417,37 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     }
     $("l-pass").value = "";
     status.textContent = "Owner accounts aren't open yet, so we can't log you in. Nothing you typed was sent or saved.";
+    track("login_tried");
+  });
+
+  /* ---------- Analytics: how visitors move through the page ---------- */
+  // Each section counts as reached once its top passes 60% of the way down the screen.
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      track("section_viewed", { section: entry.target.id });
+      io.unobserve(entry.target);
+    }), { rootMargin: "0px 0px -40% 0px" });
+    document.querySelectorAll("section[id]").forEach((s) => io.observe(s));
+  }
+  // Buttons and calls to action, with where on the page they were.
+  document.addEventListener("click", (event) => {
+    const el = event.target.closest("a.btn, button.btn, [data-login]");
+    if (!el) return;
+    const place = el.closest("section[id], header, footer, dialog");
+    track("cta_clicked", {
+      label: el.textContent.replace(/\s+/g, " ").trim().slice(0, 60),
+      place: place ? place.id || place.tagName.toLowerCase() : "page",
+    });
+  });
+  // The two calculators, once per visit each. The rent figure is kept, since it shows the size of the rental.
+  ["calc-low", "calc-high", "calc-paid", "calc-slider"].forEach((id) => {
+    if ($(id)) $(id).addEventListener("change", () => trackOnce("savings_calculator_used"));
+  });
+  if ($("rent")) $("rent").addEventListener("change", () => trackOnce("fee_calculator_used", { rent: Number($("rent").value) || null }));
+  // The first time someone starts filling in the contact form.
+  if ($("c-form")) $("c-form").addEventListener("focusin", (event) => {
+    if (!event.target.closest(".trap")) trackOnce("form_started");
   });
 })();
 </script>
