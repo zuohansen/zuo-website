@@ -36,6 +36,7 @@ export default {
     const url = new URL(request.url);
     const channel = CHANNELS[url.pathname.replace(/\/+$/, "").toLowerCase()];
     if (channel) return Response.redirect(`${url.origin}/?${channel}`, 302);
+    if (url.pathname.startsWith(RELAY + "/")) return relay(request, url);
     if (url.pathname === "/api/contact") {
       if (request.method !== "POST") return reply({ ok: false, error: "Use POST." }, 405);
       return contact(request, env, ctx);
@@ -43,6 +44,25 @@ export default {
     return env.ASSETS.fetch(request);
   },
 };
+
+// Analytics traffic goes through this site to PostHog, so ad blockers that block posthog.com don't hide visits.
+// The page's own files come from PostHog's file host; everything else goes to its data host.
+const RELAY = "/relay";
+
+async function relay(request, url) {
+  const path = url.pathname.slice(RELAY.length);
+  const host = /^\/(static|array)\//.test(path) ? "us-assets.i.posthog.com" : "us.i.posthog.com";
+  const headers = new Headers(request.headers);
+  headers.delete("cookie");
+  const ip = request.headers.get("CF-Connecting-IP");
+  if (ip) headers.set("X-Forwarded-For", ip);
+  return fetch(`https://${host}${path}${url.search}`, {
+    method: request.method,
+    headers,
+    body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+    redirect: "manual",
+  });
+}
 
 async function contact(request, env, ctx) {
   // Only accept forms sent from this site.
