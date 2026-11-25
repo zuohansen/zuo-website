@@ -1,0 +1,12 @@
+.assetsignore
+.claude
+.wrangler
+.dev.vars
+node_modules
+worker
+wrangler.jsonc
+schema.sql
+README.md
+.gitignore
+.nojekyll
+.DS_Store

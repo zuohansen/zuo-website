@@ -1,5 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><!-- standalone -->
 <title>Zuo Property Management</title>
+<link rel="canonical" href="https://zuopropertymanagement.com/">
+<script>/* The old GitHub Pages copy sends visitors to the real site. */ if (/\.github\.io$/.test(location.hostname)) location.replace("https://zuopropertymanagement.com/" + location.hash);</script>
 <meta name="description" content="Repair-first property management for single-family rentals and multi-family rentals with up to four units, in New York City, the Tri-State area and the Atlanta area.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -497,6 +499,8 @@ input[type="range"] { width: 100%; margin: 0; accent-color: var(--lamp); }
 .next-steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; color: var(--night-muted); }
 .lead-form { display: grid; gap: 16px; min-width: 0; padding: clamp(18px, 3vw, 32px); background: var(--card); color: var(--ink); border-radius: 14px; }
 .preview-note { font-size: 0.86rem; color: var(--muted); background: var(--tint); padding: 9px 12px; border-radius: 8px; }
+.privacy-note { font-size: 0.88rem; color: var(--muted); }
+.trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .row { display: grid; gap: 16px; }
 .row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .row.three { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.2fr); }
@@ -924,7 +928,7 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       </div>
     </div>
     <form class="lead-form" id="c-form" novalidate aria-labelledby="contact-title">
-      <p class="preview-note">Preview: this form checks your details, but it isn't connected yet, so nothing is sent.</p>
+      <p class="preview-note" id="c-preview" hidden>Preview: this form checks your details, but it isn't connected yet, so nothing is sent.</p>
       <div class="row two">
         <div class="field">
           <label for="c-first">First name</label>
@@ -993,8 +997,13 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
       </div>
       <div class="field">
         <label for="c-notes">Anything else we should know? <span class="opt">(optional)</span></label>
-        <textarea id="c-notes" name="notes" rows="3"></textarea>
+        <textarea id="c-notes" name="notes" rows="3" maxlength="2000"></textarea>
       </div>
+      <div class="trap" aria-hidden="true">
+        <label for="c-website">Leave this empty</label>
+        <input id="c-website" name="company_website" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="privacy-note">We use these details only to get in touch about your property, and we delete them whenever you ask.</p>
       <button type="submit" class="btn btn-lamp">Send</button>
       <p class="form-status" id="c-status" role="status" aria-live="polite"></p>
     </form>
@@ -1304,15 +1313,24 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
     return !msg;
   }
 
+  // The form sends only where the site's server runs (Cloudflare). Elsewhere, such as the GitHub preview,
+  // it checks the details and says nothing was sent.
+  const host = location.hostname;
+  const formLive = /(^|\.)zuopropertymanagement\.com$/.test(host) || /\.workers\.dev$/.test(host) ||
+    host === "localhost" || host === "127.0.0.1";
+  const pageLoaded = Date.now();
+  if (!formLive && $("c-preview")) $("c-preview").hidden = false;
+
   document.querySelectorAll("form.lead-form").forEach((form) => {
     const status = form.querySelector(".form-status");
-    const fields = Array.from(form.querySelectorAll("input, select, textarea"));
+    const button = form.querySelector('button[type="submit"]');
+    const fields = Array.from(form.querySelectorAll("input, select, textarea")).filter((el) => !el.closest(".trap"));
     fields.forEach((el) => {
       el.addEventListener("blur", () => {
         if (el.value.trim() || el.hasAttribute("aria-invalid")) validate(el);
       });
     });
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       let firstBad = null;
       fields.forEach((el) => {
@@ -1325,8 +1343,33 @@ legend { padding: 0; margin-bottom: 8px; font-weight: 650; font-size: 1rem; }
         return;
       }
       const first = form.querySelector('[name="first_name"]').value.trim();
-      status.dataset.state = "done";
-      status.textContent = "Thanks, " + first + ". This preview isn't connected yet, so your details were not sent.";
+      if (!formLive) {
+        status.dataset.state = "done";
+        status.textContent = "Thanks, " + first + ". This preview isn't connected yet, so your details were not sent.";
+        return;
+      }
+      const data = Object.fromEntries(new FormData(form));
+      data.elapsed_ms = Date.now() - pageLoaded;
+      button.disabled = true;
+      delete status.dataset.state;
+      status.textContent = "Sending…";
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || !out.ok) throw new Error(out.error || "Not sent");
+        form.reset();
+        status.dataset.state = "done";
+        status.textContent = "Thanks, " + first + ". We have your details, and we'll be in touch soon.";
+      } catch (err) {
+        status.dataset.state = "error";
+        status.textContent = "We couldn't send your details. Check your connection and try again.";
+      } finally {
+        button.disabled = false;
+      }
     });
   });
 

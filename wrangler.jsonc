@@ -1,0 +1,31 @@
+// Cloudflare settings for the website. The email address that receives leads is a secret set in Cloudflare
+// (LEAD_TO), so it never appears in this public file.
+{
+  "name": "zuo-website",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "zuopropertymanagement.com", "custom_domain": true },
+    { "pattern": "www.zuopropertymanagement.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zuo-leads",
+      "database_id": "8ad49eb2-5169-45b2-be55-7cae30613e03"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "LEAD_EMAIL"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
