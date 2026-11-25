@@ -8,4 +8,4 @@ Live site: https://zuopropertymanagement.com
 The whole site is one file, `index.html`, with four pages: Home, About us, Pricing and Contact. The page needs no build
 step. Cloudflare serves it, and `worker/index.js` receives the contact form and saves each lead (see `wrangler.jsonc` and `schema.sql`).
 
-This repository is published from another repository, so changes made here directly will be overwritten.
+Every push to `main` deploys the site to Cloudflare. This repository is published from another repository, so changes made here directly will be overwritten.
